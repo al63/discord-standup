@@ -28,7 +28,9 @@ function App() {
       },
       body: JSON.stringify({
         instanceId: discordSdk.instanceId,
-        members: participants, // just assuming right now all participants are members of the standup.
+        members: participants.map(
+          (p) => p.nickname ?? p.global_name ?? p.username
+        ), // just assuming right now all participants are members of the standup.
         duration: 15,
       }),
     });

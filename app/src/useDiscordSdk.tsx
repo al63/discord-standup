@@ -8,6 +8,8 @@ export function useDiscordSdk() {
     {
       username: string;
       id: string;
+      nickname: string;
+      global_name: string;
     }[]
   >([]);
 
