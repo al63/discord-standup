@@ -50,9 +50,11 @@ function App() {
         Start
       </button>
       <h2>Who is in the activity?</h2>
-      <pre>{JSON.stringify(participants, null, 2)}</pre>
-      <h2>Standup state</h2>
-      <pre>{JSON.stringify(standupState, null, 2)}</pre>
+      <div>
+        <pre>{JSON.stringify(participants, null, 2)}</pre>
+        <h2>Standup state</h2>
+        <pre>{JSON.stringify(standupState, null, 2)}</pre>
+      </div>
     </div>
   );
 }
