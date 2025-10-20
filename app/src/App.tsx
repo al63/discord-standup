@@ -1,6 +1,6 @@
-import { useCallback, useState} from 'react'
-import './App.css'
-import { useDiscordSdk } from './useDiscordSdk';
+import { useCallback, useState } from "react";
+import "./App.css";
+import { useDiscordSdk } from "./useDiscordSdk";
 
 interface StandupState {
   members: string[];
@@ -16,7 +16,7 @@ function App() {
 
   const start = useCallback(async () => {
     if (auth == null) {
-      console.log('no auth yet')
+      console.log("no auth yet");
       return;
     }
 
@@ -27,9 +27,9 @@ function App() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        "instanceId": discordSdk.instanceId,
-        "members": participants, // just assuming right now all participants are members of the standup.
-        "duration": 15,
+        instanceId: discordSdk.instanceId,
+        members: participants, // just assuming right now all participants are members of the standup.
+        duration: 15,
       }),
     });
 
@@ -52,7 +52,7 @@ function App() {
       <h2>Standup state</h2>
       <pre>{JSON.stringify(standupState, null, 2)}</pre>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

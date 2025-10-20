@@ -12,7 +12,6 @@ const port = 3001;
 app.use(express.json());
 
 app.post("/api/token", async (req, res) => {
-  
   // Exchange the code for an access_token
   const response = await fetch(`https://discord.com/api/oauth2/token`, {
     method: "POST",
@@ -31,12 +30,10 @@ app.post("/api/token", async (req, res) => {
   const { access_token } = await response.json();
 
   // Return the access_token to our client as { access_token: "..."}
-  res.send({access_token});
+  res.send({ access_token });
 });
 
-
 app.post("/api/start", async (req, res) => {
-
   const instanceId = req.body.instanceId;
   const members = req.body.members;
   const duration = req.body.duration ?? 30;
@@ -47,18 +44,20 @@ app.post("/api/start", async (req, res) => {
   }
 
   // validate activity instance exists
-  const validateResponse = await fetch(`https://discord.com/api/applications/${process.env.VITE_DISCORD_CLIENT_ID}/activity-instances/${instanceId}`, {
-    headers: {
-      method: 'GET',
-      "Authorization": `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-    },
-  })
+  const validateResponse = await fetch(
+    `https://discord.com/api/applications/${process.env.VITE_DISCORD_CLIENT_ID}/activity-instances/${instanceId}`,
+    {
+      headers: {
+        method: "GET",
+        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      },
+    }
+  );
   if (validateResponse.status !== 200) {
     res.status(400).send({ error: "activity instance does not exist" });
     return;
   }
 
-  
   if (state[instanceId] != null) {
     res.status(400).send({ error: "already exists" });
     return;
