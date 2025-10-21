@@ -35,6 +35,11 @@ function App() {
       }),
     });
 
+    if (res.status !== 200) {
+      console.error("failed to start standup?");
+      return;
+    }
+
     const { state } = await res.json();
     setStandupState({
       members: state.members,
