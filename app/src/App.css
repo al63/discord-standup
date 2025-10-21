@@ -1,10 +1,86 @@
 #root {
+  width: 100%;
+  height: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 24px;
   text-align: center;
+  background-color: #fdfbd9;
+  color: #4b3404;
 }
 
 pre {
   text-align: left;
+}
+
+h1 {
+  text-shadow: 2px 2px 4px #CD9A00;
+}
+
+h2 {
+ color: #4b3404
+}
+
+.waitingRoom {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.waitingRoom__content {
+  width: 90%;
+}
+
+.waitingRoom__sidebar {
+  width: 10%;
+  padding-left: 1rem;
+  border-left: 1px solid #4b3404;
+  min-width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.waitingRoom__activeParticipants {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  justify-content: center;
+}
+
+
+.waitingRoom__activeParticipant {
+  position: relative;
+  max-width: 150px;
+
+  img {
+    border-radius: 50%;
+  }
+}
+
+.waitingRoom__participant {
+  font-size: 12px;
+
+  img {
+    border-radius: 50%;
+  }
+}
+
+.waitingRoom__startButton {
+  margin: 16px 0;
+  border: 2px solid #D80000;
+  background-color: white;
+  color: #D80000;
+}
+
+.waitingRoom__leaveButton {
+  border: 2px solid #D80000;
+  background-color: white;
+  color: #D80000;
+  position: absolute;
+  top: 0;
+  right: 0;
 }

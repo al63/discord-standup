@@ -9,6 +9,16 @@ export interface Participant {
   id: string;
   nickname?: string;
   global_name?: string | null;
+  avatar?: string | null;
+}
+
+export interface User {
+  username: string;
+  discriminator: string;
+  id: string;
+  public_flags: number;
+  avatar?: string | null | undefined;
+  global_name?: string | null | undefined;
 }
 
 /*
@@ -28,6 +38,8 @@ export function useDiscordSdk(
   setInitState: (standupState: StandupState) => void
 ) {
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [activeParticipants, setActiveParticipants] =
+    useState<Participant[]>(participants);
   const ranInit = useRef(false);
 
   useEffect(() => {
@@ -57,7 +69,7 @@ export function useDiscordSdk(
         }),
       });
       const { access_token, state } = await response.json();
-      await discordSdk.commands.authenticate({
+      const { user } = await discordSdk.commands.authenticate({
         access_token,
       });
 
@@ -71,19 +83,36 @@ export function useDiscordSdk(
             }
           : {
               type: "pending",
+              currentUser: user,
             }
       );
+
       discordSdk.subscribe(
         Events.ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE,
         (update) => {
+          const newParticipants = update.participants.filter(
+            (p) => !participants.some((existing) => existing.id === p.id)
+          );
+          const removedParticipants = participants.filter(
+            (p) => !update.participants.some((existing) => existing.id === p.id)
+          );
+          const updatedActiveParticipants = activeParticipants.filter(
+            (p) => !removedParticipants.some((removed) => removed.id === p.id)
+          );
+          setActiveParticipants([
+            ...updatedActiveParticipants,
+            ...newParticipants,
+          ]);
+
           setParticipants(update.participants);
         }
       );
     })();
-  }, [setInitState]);
+  }, [activeParticipants, participants, setInitState]);
 
   return {
     participants,
+    activeParticipants,
     discordSdk,
   };
 }

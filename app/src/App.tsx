@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import { useDiscordSdk } from "./useDiscordSdk";
+import { type User } from "./useDiscordSdk";
 import { WaitingRoom } from "./WaitingRoom";
 import { Standup } from "./Standup";
 
@@ -10,6 +11,7 @@ type Loading = {
 
 type Pending = {
   type: "pending";
+  currentUser: User;
 };
 
 type Running = {
@@ -25,7 +27,8 @@ function App() {
   const [standupState, setStandupState] = useState<StandupState>({
     type: "loading",
   });
-  const { participants, discordSdk } = useDiscordSdk(setStandupState);
+  const { participants, activeParticipants, discordSdk } =
+    useDiscordSdk(setStandupState);
 
   if (standupState.type === "loading") {
     return <div>Loading...</div>;
@@ -33,7 +36,9 @@ function App() {
     return (
       <WaitingRoom
         participants={participants}
+        activeParticipants={activeParticipants}
         discordSdk={discordSdk}
+        currentUser={standupState.currentUser}
         onStart={setStandupState}
       />
     );
