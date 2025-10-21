@@ -1,12 +1,22 @@
+/* https://coolors.co/780116-f7b538-db7c26-d8572a-c32f27 */
+/* CSS HEX */
+:root {
+  --burgundy: #780116ff;
+  --xanthous: #f7b538ff;
+  --ochre: #db7c26ff;
+  --flame: #d8572aff;
+  --fire-engine-red: #c32f27ff;
+  --background: #e5e5e5ff;
+}
+
 #root {
   width: 100%;
   height: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px;
   text-align: center;
-  background-color: #fdfbd9;
-  color: #4b3404;
+  background-color: var(--flame);
+  color: black;
 }
 
 pre {
@@ -14,11 +24,7 @@ pre {
 }
 
 h1 {
-  text-shadow: 2px 2px 4px #CD9A00;
-}
-
-h2 {
- color: #4b3404
+  color: var(--burgundy);
 }
 
 .waitingRoom {
@@ -29,13 +35,17 @@ h2 {
 }
 
 .waitingRoom__content {
-  width: 90%;
+  background-color: var(--background);
+  border-radius: 8px;
+  margin: 16px;
+  width: 85%;
 }
 
 .waitingRoom__sidebar {
-  width: 10%;
-  padding-left: 1rem;
-  border-left: 1px solid #4b3404;
+  width: 15%;
+  padding: 16px;
+  background-color: var(--flame);
+  color: white;
   min-width: 64px;
   display: flex;
   flex-direction: column;
@@ -49,12 +59,11 @@ h2 {
   align-items: flex-start;
   gap: 16px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
-
 .waitingRoom__activeParticipant {
-  position: relative;
-  max-width: 150px;
+  margin: 20px 40px;
 
   img {
     border-radius: 50%;
@@ -63,6 +72,8 @@ h2 {
 
 .waitingRoom__participant {
   font-size: 12px;
+  font-weight: bold;
+  border-radius: 8px;
 
   img {
     border-radius: 50%;
@@ -70,17 +81,47 @@ h2 {
 }
 
 .waitingRoom__startButton {
-  margin: 16px 0;
-  border: 2px solid #D80000;
-  background-color: white;
-  color: #D80000;
+  border: 2px solid var(--fire-engine-red);
+  background-color: var(--fire-engine-red);
+  color: var(white);
+
+  &:hover {
+    animation: glow 1s infinite alternate;
+    cursor: pointer;
+    border: 2px solid var(--fire-engine-red);
+  }
 }
 
 .waitingRoom__leaveButton {
-  border: 2px solid #D80000;
-  background-color: white;
-  color: #D80000;
-  position: absolute;
+  margin-top: 8px;
+  background-color: var(--flame);
+  color: white;
   top: 0;
   right: 0;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px 0px var(--flame);
+    transform: rotate(0deg);
+  }
+  to {
+    box-shadow: 0 0 30px 10px var(--xanthous);
+    transform: rotate(360deg);
+  }
+}
+
+.standup {
+  width: 100%;
+  height: 100%;
+}
+
+
+.standup__activeContainer {
+  background-color: var(--burgundy);
+  color: white;
+  margin: 20px 40px;
+  padding: 16px 32px;
+  border-radius: 8px;
+
 }

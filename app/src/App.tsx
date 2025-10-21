@@ -5,16 +5,16 @@ import { type User } from "./useDiscordSdk";
 import { WaitingRoom } from "./WaitingRoom";
 import { Standup } from "./Standup";
 
-type Loading = {
+export type Loading = {
   type: "loading";
 };
 
-type Pending = {
+export type Pending = {
   type: "pending";
   currentUser: User;
 };
 
-type Running = {
+export type Running = {
   type: "running";
   members: string[];
   startedAt: Date;

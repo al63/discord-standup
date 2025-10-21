@@ -3,6 +3,7 @@ import "./App.css";
 import { type Participant, type User } from "./useDiscordSdk";
 import type { DiscordSDK } from "@discord/embedded-app-sdk";
 import type { StandupState } from "./App";
+import { ParticipantAvatar } from "./ParticipantAvatar";
 
 interface WaitingRoomProps {
   participants: Participant[];
@@ -80,7 +81,7 @@ export function WaitingRoom({
   return (
     <div className="waitingRoom">
       <div className="waitingRoom__content">
-        <h1>{channelName != null ? `${channelName} - Standup` : "Standup"}</h1>
+        <h1>{channelName != null ? `${channelName} Standup` : "Standup"}</h1>
         <button
           className="waitingRoom__startButton"
           onClick={start}
@@ -88,57 +89,35 @@ export function WaitingRoom({
         >
           Start it up!
         </button>
-        <h2>Participating</h2>
         <div className="waitingRoom__activeParticipants">
           {activeParticipants.map((p) => (
             <div
               className="waitingRoom__activeParticipant"
               key={`${p.id}-active`}
             >
-              <img
-                src={
-                  p.avatar != null
-                    ? `https://cdn.discordapp.com/avatars/${p.id}/${p.avatar}.png?size=256`
-                    : `https://cdn.discordapp.com/embed/avatars/${
-                        (BigInt(p.id) >> 22n) % 6n
-                      }.png`
-                }
-                alt="avatar"
-                width={128}
-                height={128}
-              />
+              <ParticipantAvatar participant={p} size={128} />
               <div>{p.nickname ?? p.global_name ?? p.username}</div>
-              {p.id === currentUser.id ? <div>(you)</div> : null}
               {p.id === currentUser.id ? (
-                <button
-                  className="waitingRoom__leaveButton"
-                  onClick={() => {}} // TODO
-                  disabled={participants.length === 0}
-                >
-                  x
-                </button>
+                <>
+                  <div>(you)</div>
+                  <button
+                    className="waitingRoom__leaveButton"
+                    onClick={() => {}} // TODO
+                    disabled={participants.length === 0}
+                  >
+                    leave
+                  </button>
+                </>
               ) : null}
             </div>
           ))}
         </div>
-        <pre>{JSON.stringify(participants, null, 2)}</pre>
       </div>
       <div className="waitingRoom__sidebar">
-        <h3>Who's Here</h3>
+        <h3>In Voice</h3>
         {participants.map((p) => (
           <div className="waitingRoom__participant" key={p.id}>
-            <img
-              src={
-                p.avatar != null
-                  ? `https://cdn.discordapp.com/avatars/${p.id}/${p.avatar}.png?size=64`
-                  : `https://cdn.discordapp.com/embed/avatars/${
-                      (BigInt(p.id) >> 22n) % 6n
-                    }.png`
-              }
-              alt="avatar"
-              width={64}
-              height={64}
-            />
+            <ParticipantAvatar participant={p} size={64} />
             <div>{p.nickname ?? p.global_name ?? p.username}</div>
           </div>
         ))}
