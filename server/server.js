@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
-import { validateBody } from "./validators.js";
+import { validateBody, validateQuery } from "./validators.js";
 import { z } from "zod";
 dotenv.config({ path: "../.env" });
 
@@ -21,6 +21,8 @@ app.post(
     })
   ),
   async (req, res) => {
+    // TODO: also gate with check for activity existing, just have one shared middleware or w/e
+
     // Exchange the code for an access_token
     const response = await fetch(`https://discord.com/api/oauth2/token`, {
       method: "POST",
@@ -43,6 +45,23 @@ app.post(
   }
 );
 
+app.get(
+  "/api/sync",
+  validateQuery(
+    z.object({
+      instanceId: z.string(),
+    })
+  ),
+  async (req, res) => {
+    if (state[req.query.instanceId] == null) {
+      res.status(404).send({ error: "standup does not exist" });
+      return;
+    }
+
+    res.send({ state: state[req.query.instanceId] });
+  }
+);
+
 app.post(
   "/api/start",
   validateBody(
@@ -57,8 +76,8 @@ app.post(
     const members = req.body.members;
     const duration = req.body.duration ?? 30;
 
-    if (instanceId == null) {
-      res.status(400).send({ error: "instanceId is required" });
+    if (state[instanceId] != null) {
+      res.status(400).send({ error: "standup already exists" });
       return;
     }
 
@@ -77,21 +96,16 @@ app.post(
       return;
     }
 
-    if (state[instanceId] != null) {
-      res.status(400).send({ error: "already exists" });
-      return;
-    }
-
     state[instanceId] = {
       members,
       startedAt: new Date(),
       duration,
     };
 
-    // yeet from memory after 10 minutes
+    // yeet from memory after 30 minutes
     setTimeout(() => {
       delete state[instanceId];
-    }, 1000 * 60 * 10);
+    }, 1000 * 60 * 30);
 
     res.send({ state: state[instanceId] });
   }
