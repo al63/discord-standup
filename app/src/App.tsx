@@ -20,7 +20,14 @@ function App() {
       />
     );
   } else {
-    return <Standup standupState={standupState} />;
+    return (
+      <Standup
+        participants={participants}
+        standupState={standupState}
+        currentUser={auth.user}
+        websocket={websocket}
+      />
+    );
   }
 }
 

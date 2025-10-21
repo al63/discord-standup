@@ -16,6 +16,7 @@ export type RunningState = {
   members: string[];
   startedAt: Date;
   duration: number;
+  currentOffset: number;
 };
 
 export type StandupState = LoadingState | PendingState | RunningState;
@@ -42,7 +43,10 @@ export function useStandupWebsocket(
     );
 
     websocket.current.addEventListener("open", () => {
-      console.log("websocket connection opened, sending join message");
+      console.log(
+        "websocket connection opened, sending join message",
+        websocket.current
+      );
 
       // opt in to standup by default on open
       websocket.current?.send(
@@ -64,6 +68,7 @@ export function useStandupWebsocket(
             members: parsed.state.members,
             startedAt: new Date(parsed.state.startedAt),
             duration: parsed.state.duration,
+            currentOffset: parsed.state.currentOffset ?? 0,
           });
         } else {
           setStandupState({

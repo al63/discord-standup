@@ -57,6 +57,10 @@ function broadcastState(instanceId) {
           members: state[instanceId].members,
           startedAt: state[instanceId].startedAt,
           duration: state[instanceId].duration,
+          currentOffset:
+            state[instanceId].startedAt == null
+              ? 0
+              : new Date() - state[instanceId].startedAt,
         },
       })
     );
@@ -65,23 +69,6 @@ function broadcastState(instanceId) {
 
 app.ws("/api/ws/:instanceId", async (ws, req) => {
   const instanceId = req.params.instanceId;
-
-  /*
-  // validate activity instance exists
-  const validateResponse = await fetch(
-    `https://discord.com/api/applications/${process.env.VITE_DISCORD_CLIENT_ID}/activity-instances/${instanceId}`,
-    {
-      headers: {
-        method: "GET",
-        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-      },
-    }
-  );
-  if (validateResponse.status !== 200) {
-    ws.close();
-    return;
-  }
-  */
 
   if (state[instanceId] == null) {
     state[instanceId] = {
@@ -100,6 +87,7 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
     }
 
     const parsed = JSON.parse(msg);
+    console.log("ws message received:", parsed);
 
     if (parsed.type === "join") {
       /*
@@ -149,6 +137,19 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
 
       state[instanceId].startedAt = new Date();
       state[instanceId].duration = parsed.duration ?? 30;
+      state[instanceId].members = state[instanceId].members.toSorted(
+        () => Math.random() - 0.5
+      );
+
+      broadcastState(instanceId);
+    } else if (parsed.type === "reset") {
+      /*
+      {
+        type: "reset",
+      }
+      */
+      state[instanceId].startedAt = null;
+      state[instanceId].duration = null;
       broadcastState(instanceId);
     } else if (parsed.type === "echo") {
       ws.send(
@@ -168,9 +169,13 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
     state[instanceId].connections = state[instanceId].connections.filter(
       (connection) => connection !== ws
     );
-    state[instanceId].members = state[instanceId].members.filter(
-      (member) => member !== ws.userId
-    );
+
+    // if standup is running and someone leaves, keep them in the list so order doesnt break
+    if (state[instanceId].startedAt == null) {
+      state[instanceId].members = state[instanceId].members.filter(
+        (member) => member !== ws.userId
+      );
+    }
 
     if (state[instanceId].connections.length === 0) {
       delete state[instanceId];

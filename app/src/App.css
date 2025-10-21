@@ -116,12 +116,10 @@ h1 {
   height: 100%;
 }
 
-
 .standup__activeContainer {
   background-color: var(--burgundy);
   color: white;
   margin: 20px 40px;
   padding: 16px 32px;
   border-radius: 8px;
-
 }
