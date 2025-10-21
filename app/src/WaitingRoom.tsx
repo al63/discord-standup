@@ -47,6 +47,7 @@ export function WaitingRoom({
 
     const { state } = await res.json();
     onStart({
+      type: "running",
       members: state.members,
       startedAt: new Date(state.startedAt),
       duration: state.duration ?? 30,
