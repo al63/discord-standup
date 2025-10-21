@@ -2,6 +2,7 @@ import "./App.css";
 import { useDiscordSdk } from "./useDiscordSdk";
 import { WaitingRoom } from "./WaitingRoom";
 import { useStandupWebsocket } from "./useWebsocket";
+import { Standup } from "./Standup";
 
 function App() {
   const { participants, discordSdk, auth } = useDiscordSdk();
@@ -18,9 +19,9 @@ function App() {
         websocket={websocket}
       />
     );
+  } else {
+    return <Standup standupState={standupState} />;
   }
-
-  return null;
 }
 
 export default App;

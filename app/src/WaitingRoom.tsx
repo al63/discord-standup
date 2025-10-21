@@ -4,6 +4,7 @@ import type { DiscordSDK } from "@discord/embedded-app-sdk";
 import "./App.css";
 import { type Participant, type User } from "./useDiscordSdk";
 import type { PendingState } from "./useWebsocket";
+import { ParticipantAvatar } from "./ParticipantAvatar";
 
 interface WaitingRoomProps {
   participants: Participant[];

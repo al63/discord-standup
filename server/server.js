@@ -122,7 +122,10 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
         userId: "123",
       }
       */
-      if (!state[instanceId].members.includes(parsed.userId)) {
+      if (
+        !state[instanceId].members.includes(parsed.userId) ||
+        state[instanceId].startedAt != null
+      ) {
         return;
       }
 
