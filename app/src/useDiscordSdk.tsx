@@ -3,24 +3,28 @@ import { useEffect, useCallback, useRef, useState } from "react";
 
 const discordSdk = new DiscordSDK(import.meta.env.VITE_DISCORD_CLIENT_ID);
 
-export function useDiscordSdk() {
-  const [participants, setParticipants] = useState<
-    {
-      username: string;
-      id: string;
-      nickname?: string;
-      global_name?: string | null;
-    }[]
-  >([]);
+export interface Participant {
+  username: string;
+  id: string;
+  nickname?: string;
+  global_name?: string | null;
+}
 
-  const auth = useRef<{
-    access_token: string;
-    user: {
-      username: string;
-      discriminator: string;
-      id: string;
-    };
-  } | null>(null);
+/*
+returned by authenticate, idk if we need this
+
+export interface DiscordAuth {
+  access_token: string;
+  user: {
+    username: string;
+    discriminator: string;
+    id: string;
+  };
+}
+  */
+
+export function useDiscordSdk() {
+  const [participants, setParticipants] = useState<Participant[]>([]);
 
   const init = useCallback(async () => {
     console.log("initializing discord sdk");
@@ -44,7 +48,7 @@ export function useDiscordSdk() {
       }),
     });
     const { access_token } = await response.json();
-    auth.current = await discordSdk.commands.authenticate({
+    await discordSdk.commands.authenticate({
       access_token,
     });
   }, []);
@@ -65,7 +69,6 @@ export function useDiscordSdk() {
 
   return {
     participants,
-    auth,
     discordSdk,
   };
 }
