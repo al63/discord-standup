@@ -1,13 +1,15 @@
 import express from "express";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
-import { validateBody, validateQuery } from "./validators.js";
+import { validateBody } from "./validators.js";
+import expressWs from "express-ws";
 import { z } from "zod";
 dotenv.config({ path: "../.env" });
 
 const state = {};
 
-const app = express();
+const appWs = expressWs(express());
+const app = appWs.app;
 const port = 3001;
 
 // Allow express to parse JSON bodies
@@ -38,75 +40,141 @@ app.post(
     });
 
     const { access_token } = await response.json();
-    res.send({ access_token, state: state[req.body.instanceId] });
+    res.send({ access_token });
   }
 );
 
-app.get(
-  "/api/sync",
-  validateQuery(
-    z.object({
-      instanceId: z.string(),
-    })
-  ),
-  async (req, res) => {
-    if (state[req.query.instanceId] == null) {
-      res.status(404).send({ error: "standup does not exist" });
-      return;
-    }
-
-    res.send({ state: state[req.query.instanceId] });
+function broadcastState(instanceId) {
+  if (state[instanceId] == null) {
+    return;
   }
-);
 
-app.post(
-  "/api/start",
-  validateBody(
-    z.object({
-      instanceId: z.string(),
-      members: z.array(z.string().max(60)).max(20),
-      duration: z.number().min(1).max(60).default(30),
-    })
-  ),
-  async (req, res) => {
-    const instanceId = req.body.instanceId;
-    const members = req.body.members;
-    const duration = req.body.duration ?? 30;
-
-    if (state[instanceId] != null) {
-      res.status(400).send({ error: "standup already exists" });
-      return;
-    }
-
-    // validate activity instance exists
-    const validateResponse = await fetch(
-      `https://discord.com/api/applications/${process.env.VITE_DISCORD_CLIENT_ID}/activity-instances/${instanceId}`,
-      {
-        headers: {
-          method: "GET",
-          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+  state[instanceId].connections.forEach((connection) => {
+    connection.send(
+      JSON.stringify({
+        type: "state",
+        state: {
+          members: state[instanceId].members,
+          startedAt: state[instanceId].startedAt,
+          duration: state[instanceId].duration,
         },
-      }
+      })
     );
-    if (validateResponse.status !== 200) {
-      res.status(400).send({ error: "activity instance does not exist" });
+  });
+}
+
+app.ws("/api/ws/:instanceId", async (ws, req) => {
+  const instanceId = req.params.instanceId;
+
+  /*
+  // validate activity instance exists
+  const validateResponse = await fetch(
+    `https://discord.com/api/applications/${process.env.VITE_DISCORD_CLIENT_ID}/activity-instances/${instanceId}`,
+    {
+      headers: {
+        method: "GET",
+        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      },
+    }
+  );
+  if (validateResponse.status !== 200) {
+    ws.close();
+    return;
+  }
+  */
+
+  if (state[instanceId] == null) {
+    state[instanceId] = {
+      connections: [ws],
+      members: [],
+      startedAt: null,
+      duration: null,
+    };
+  } else {
+    state[instanceId].connections.push(ws);
+  }
+
+  ws.on("message", (msg) => {
+    if (state[instanceId] == null) {
       return;
     }
 
-    state[instanceId] = {
-      members,
-      startedAt: new Date(),
-      duration,
-    };
+    const parsed = JSON.parse(msg);
 
-    // yeet from memory after 30 minutes
-    setTimeout(() => {
+    if (parsed.type === "join") {
+      /*
+      {
+        type: "join",
+        userId: "123",
+      }
+      */
+      if (state[instanceId].members.includes(parsed.userId)) {
+        return;
+      }
+
+      ws.userId = parsed.userId;
+      state[instanceId].members.push(parsed.userId);
+      broadcastState(instanceId);
+    } else if (parsed.type === "leave") {
+      /*
+      {
+        type: "leave",
+        userId: "123",
+      }
+      */
+      if (!state[instanceId].members.includes(parsed.userId)) {
+        return;
+      }
+
+      state[instanceId].members = state[instanceId].members.filter(
+        (member) => member !== parsed.userId
+      );
+      broadcastState(instanceId);
+    } else if (parsed.type === "start") {
+      /*
+      {
+        type: "start",
+        duration: 15,
+      }
+      */
+      if (
+        state[instanceId].startedAt != null ||
+        state[instanceId].members.length === 0
+      ) {
+        return;
+      }
+
+      state[instanceId].startedAt = new Date();
+      state[instanceId].duration = parsed.duration ?? 30;
+      broadcastState(instanceId);
+    } else if (parsed.type === "echo") {
+      ws.send(
+        JSON.stringify({
+          type: "echo",
+          message: parsed,
+        })
+      );
+    }
+  });
+
+  ws.on("close", () => {
+    if (state[instanceId] == null) {
+      return;
+    }
+
+    state[instanceId].connections = state[instanceId].connections.filter(
+      (connection) => connection !== ws
+    );
+    state[instanceId].members = state[instanceId].members.filter(
+      (member) => member !== ws.userId
+    );
+
+    if (state[instanceId].connections.length === 0) {
       delete state[instanceId];
-    }, 1000 * 60 * 30);
-
-    res.send({ state: state[instanceId] });
-  }
-);
+    }
+    broadcastState(instanceId);
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);

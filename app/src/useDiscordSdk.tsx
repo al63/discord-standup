@@ -1,6 +1,5 @@
 import { DiscordSDK, Events } from "@discord/embedded-app-sdk";
-import { useEffect, useCallback, useRef, useState } from "react";
-import type { StandupState } from "./App";
+import { useEffect, useRef, useState } from "react";
 
 const discordSdk = new DiscordSDK(import.meta.env.VITE_DISCORD_CLIENT_ID);
 
@@ -21,25 +20,14 @@ export interface User {
   global_name?: string | null | undefined;
 }
 
-/*
-returned by authenticate, idk if we need this
-
 export interface DiscordAuth {
   access_token: string;
-  user: {
-    username: string;
-    discriminator: string;
-    id: string;
-  };
+  user: User;
 }
-  */
 
-export function useDiscordSdk(
-  setInitState: (standupState: StandupState) => void
-) {
+export function useDiscordSdk() {
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [activeParticipants, setActiveParticipants] =
-    useState<Participant[]>(participants);
+  const [auth, setAuth] = useState<DiscordAuth | null>(null);
   const ranInit = useRef(false);
 
   useEffect(() => {
@@ -68,51 +56,24 @@ export function useDiscordSdk(
           instanceId: discordSdk.instanceId,
         }),
       });
-      const { access_token, state } = await response.json();
-      const { user } = await discordSdk.commands.authenticate({
+      const { access_token } = await response.json();
+      const auth = await discordSdk.commands.authenticate({
         access_token,
       });
-
-      setInitState(
-        state != null
-          ? {
-              type: "running",
-              members: state.members,
-              startedAt: new Date(state.startedAt),
-              duration: state.duration ?? 30,
-            }
-          : {
-              type: "pending",
-              currentUser: user,
-            }
-      );
+      setAuth(auth);
 
       discordSdk.subscribe(
         Events.ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE,
         (update) => {
-          const newParticipants = update.participants.filter(
-            (p) => !participants.some((existing) => existing.id === p.id)
-          );
-          const removedParticipants = participants.filter(
-            (p) => !update.participants.some((existing) => existing.id === p.id)
-          );
-          const updatedActiveParticipants = activeParticipants.filter(
-            (p) => !removedParticipants.some((removed) => removed.id === p.id)
-          );
-          setActiveParticipants([
-            ...updatedActiveParticipants,
-            ...newParticipants,
-          ]);
-
           setParticipants(update.participants);
         }
       );
     })();
-  }, [activeParticipants, participants, setInitState]);
+  }, []);
 
   return {
     participants,
-    activeParticipants,
     discordSdk,
+    auth,
   };
 }

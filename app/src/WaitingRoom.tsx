@@ -1,68 +1,34 @@
 import { useCallback, useEffect, useState } from "react";
 import "./App.css";
-import { type Participant, type User } from "./useDiscordSdk";
 import type { DiscordSDK } from "@discord/embedded-app-sdk";
-import type { StandupState } from "./App";
-import { ParticipantAvatar } from "./ParticipantAvatar";
+import "./App.css";
+import { type Participant, type User } from "./useDiscordSdk";
+import type { PendingState } from "./useWebsocket";
 
 interface WaitingRoomProps {
   participants: Participant[];
+  standupState: PendingState;
   discordSdk: DiscordSDK;
   currentUser: User;
-  onStart: (standupState: StandupState) => void;
-  activeParticipants: Participant[];
+  websocket: WebSocket | null;
 }
 
 export function WaitingRoom({
   participants,
+  standupState,
   discordSdk,
-  onStart,
   currentUser,
-  activeParticipants,
+  websocket,
 }: WaitingRoomProps) {
   const [channelName, setChannelName] = useState<string | null>(null);
   const start = useCallback(async () => {
-    console.log("starting", discordSdk.instanceId, activeParticipants);
-    const res = await fetch("/api/start", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        instanceId: discordSdk.instanceId,
-        members: activeParticipants.map(
-          (p) => p.nickname ?? p.global_name ?? p.username
-        ),
+    websocket?.send(
+      JSON.stringify({
+        type: "start",
         duration: 15,
-      }),
-    });
-
-    if (res.status !== 200) {
-      console.error("failed to start standup?");
-      return;
-    }
-
-    // timer below will eventually start? idk make it better
-  }, [activeParticipants, discordSdk.instanceId]);
-
-  const sync = useCallback(async () => {
-    const res = await fetch(`/api/sync?instanceId=${discordSdk.instanceId}`);
-    if (res.status !== 200) {
-      return setTimeout(sync, 1000);
-    }
-
-    const { state } = await res.json();
-    onStart({
-      type: "running",
-      members: state.members,
-      startedAt: new Date(state.startedAt),
-      duration: state.duration ?? 30,
-    });
-  }, [discordSdk.instanceId, onStart]);
-
-  useEffect(() => {
-    setTimeout(sync, 1000);
-  }, [discordSdk.instanceId, onStart, sync]);
+      })
+    );
+  }, [websocket]);
 
   useEffect(() => {
     const fetchChannelName = async () => {
@@ -77,6 +43,10 @@ export function WaitingRoom({
 
     fetchChannelName();
   }, [discordSdk]);
+
+  const activeParticipants = participants.filter((p) =>
+    standupState.members.includes(p.id)
+  );
 
   return (
     <div className="waitingRoom">

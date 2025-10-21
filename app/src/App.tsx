@@ -1,50 +1,26 @@
-import { useState } from "react";
 import "./App.css";
 import { useDiscordSdk } from "./useDiscordSdk";
-import { type User } from "./useDiscordSdk";
 import { WaitingRoom } from "./WaitingRoom";
-import { Standup } from "./Standup";
-
-export type Loading = {
-  type: "loading";
-};
-
-export type Pending = {
-  type: "pending";
-  currentUser: User;
-};
-
-export type Running = {
-  type: "running";
-  members: string[];
-  startedAt: Date;
-  duration: number;
-};
-
-export type StandupState = Loading | Pending | Running;
+import { useStandupWebsocket } from "./useWebsocket";
 
 function App() {
-  const [standupState, setStandupState] = useState<StandupState>({
-    type: "loading",
-  });
-  const { participants, activeParticipants, discordSdk } =
-    useDiscordSdk(setStandupState);
-
-  if (standupState.type === "loading") {
+  const { participants, discordSdk, auth } = useDiscordSdk();
+  const { standupState, websocket } = useStandupWebsocket(auth, discordSdk);
+  if (standupState.type === "loading" || auth == null) {
     return <div>Loading...</div>;
   } else if (standupState.type === "pending") {
     return (
       <WaitingRoom
         participants={participants}
-        activeParticipants={activeParticipants}
+        standupState={standupState}
         discordSdk={discordSdk}
-        currentUser={standupState.currentUser}
-        onStart={setStandupState}
+        currentUser={auth.user}
+        websocket={websocket}
       />
     );
-  } else {
-    return <Standup standupState={standupState} />;
   }
+
+  return null;
 }
 
 export default App;
