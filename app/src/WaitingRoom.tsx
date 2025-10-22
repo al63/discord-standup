@@ -5,7 +5,6 @@ import "./App.css";
 import { type Participant, type User } from "./useDiscordSdk";
 import type { PendingState } from "./useWebsocket";
 import { ParticipantAvatar } from "./ParticipantAvatar";
-import { Countdown } from "./Countdown";
 
 interface WaitingRoomProps {
   participants: Participant[];
@@ -23,15 +22,10 @@ export function WaitingRoom({
   websocket,
 }: WaitingRoomProps) {
   const [channelName, setChannelName] = useState<string | null>(null);
-  const [startCountdown, setStartCountdown] = useState<boolean>(false);
   const [duration, setDuration] = useState<number>(15);
   const isValidDuration = duration >= 5 && duration <= 60;
 
   const start = useCallback(async () => {
-    setStartCountdown(true);
-  }, []);
-
-  const onCountdownComplete = useCallback(async () => {
     websocket?.send(
       JSON.stringify({
         type: "start",
@@ -80,10 +74,6 @@ export function WaitingRoom({
     () => standupState.members.includes(currentUser.id),
     [currentUser.id, standupState.members]
   );
-
-  if (startCountdown) {
-    return <Countdown onCountdownComplete={onCountdownComplete} />;
-  }
 
   return (
     <>

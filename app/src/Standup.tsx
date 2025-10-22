@@ -49,10 +49,13 @@ export function Standup({
   const currentSpeaker = participants.find((p) => p.id === currentSpeakerId);
 
   useEffect(() => {
-    if (currentSpeaker == null || currentIndex >= standupState.members.length) {
+    if (
+      (localOffset > 0 && currentSpeaker == null) ||
+      currentIndex >= standupState.members.length
+    ) {
       setCompleted(true);
     }
-  }, [currentSpeaker, currentIndex, standupState.members.length]);
+  }, [currentSpeaker, currentIndex, standupState.members.length, localOffset]);
 
   const onGoAgain = useCallback(() => {
     console.log("sending reset message...");
@@ -74,6 +77,17 @@ export function Standup({
   );
   const nextSpeakerName =
     nextSpeaker?.nickname ?? nextSpeaker?.global_name ?? nextSpeaker?.username;
+
+  if (localOffset <= 0) {
+    return (
+      <div className="countdownScreen">
+        <h1>Starting in</h1>
+        <div className="countdownScreen__countdown">
+          {Math.ceil(Math.abs(localOffset) / 1000)}
+        </div>
+      </div>
+    );
+  }
 
   if (completed) {
     return (

@@ -11,6 +11,7 @@ const state = {};
 const appWs = expressWs(express());
 const app = appWs.app;
 const port = 3001;
+const COUNTDOWN_SECONDS_MS = 5000;
 
 // Allow express to parse JSON bodies
 app.use(express.json());
@@ -135,7 +136,7 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
         return;
       }
 
-      state[instanceId].startedAt = new Date();
+      state[instanceId].startedAt = new Date(Date.now() + COUNTDOWN_SECONDS_MS);
       state[instanceId].duration = parsed.duration ?? 30;
       state[instanceId].members = state[instanceId].members.toSorted(
         () => Math.random() - 0.5
