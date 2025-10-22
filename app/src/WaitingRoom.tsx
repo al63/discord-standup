@@ -78,45 +78,47 @@ export function WaitingRoom({
   return (
     <>
       <div className="waitingRoom">
-        <h1>
+        <h1 className="waitingRoom__title">
           <img src="popcorn.png" height="60" />
           {channelName != null ? `${channelName} Standup` : "Standup"}
           <img src="popcorn.png" height="60" />
         </h1>
         <div className="waitingRoom__controls">
-          <div>Time per person (5-60 seconds)</div>
-          <div className="waitingRoom__durationControls">
-            <button
-              className="waitingRoom__durationControl"
-              onClick={() => setDuration((d) => Math.max(5, d - 1))}
-              title="Decrease value"
-              aria-label="Decrease value"
-            >
-              -
-            </button>
-            <input
-              className="waitingRoom__durationInput"
-              type="number"
-              min="5"
-              max="60"
-              value={duration}
-              onChange={(event) => setDuration(event.target.valueAsNumber)}
-            />
-            <button
-              className="waitingRoom__durationControl"
-              onClick={() => setDuration((d) => Math.min(60, d + 1))}
-              title="Increase value"
-              aria-label="Increase value"
-            >
-              +
-            </button>
+          <div className="waitingRoom__durationControlsContainer">
+            <div>Time per person (5-60 seconds)</div>
+            <div className="waitingRoom__durationControls">
+              <button
+                className="waitingRoom__durationControl"
+                onClick={() => setDuration((d) => Math.max(5, d - 1))}
+                title="Decrease value"
+                aria-label="Decrease value"
+              >
+                -
+              </button>
+              <input
+                className="waitingRoom__durationInput"
+                type="number"
+                min="5"
+                max="60"
+                value={duration}
+                onChange={(event) => setDuration(event.target.valueAsNumber)}
+              />
+              <button
+                className="waitingRoom__durationControl"
+                onClick={() => setDuration((d) => Math.min(60, d + 1))}
+                title="Increase value"
+                aria-label="Increase value"
+              >
+                +
+              </button>
+            </div>
           </div>
           <button
             className="waitingRoom__startButton"
             onClick={start}
             disabled={activeParticipants.length === 0 || !isValidDuration}
           >
-            Start it up!
+            Start standup
           </button>
           {!isActiveParticipant && (
             <button className="waitingRoom__joinButton" onClick={join}>
@@ -139,7 +141,7 @@ export function WaitingRoom({
                     onClick={leave}
                     disabled={participants.length === 0}
                   >
-                    leave
+                    Leave
                   </button>
                 )}
               </div>
