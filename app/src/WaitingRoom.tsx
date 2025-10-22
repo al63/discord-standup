@@ -141,10 +141,9 @@ export function WaitingRoom({
               key={`${p.id}-active`}
             >
               <ParticipantAvatar participant={p} size={128} />
-              <div>{p.nickname ?? p.global_name ?? p.username}</div>
-              {p.id === currentUser.id ? (
-                <>
-                  <div>(you)</div>
+              <div className="waitingRoom__participantInfo">
+                <div>{p.nickname ?? p.global_name ?? p.username}</div>
+                {p.id === currentUser.id && (
                   <button
                     className="waitingRoom__leaveButton"
                     onClick={leave}
@@ -152,8 +151,8 @@ export function WaitingRoom({
                   >
                     leave
                   </button>
-                </>
-              ) : null}
+                )}
+              </div>
             </div>
           ))}
         </div>

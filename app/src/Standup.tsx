@@ -77,7 +77,7 @@ export function Standup({
 
   if (completed) {
     return (
-      <div className="standup">
+      <div className="standup__completed">
         <h1>Standup over!</h1>
         <button onClick={onGoAgain}>Go again?</button>
       </div>
@@ -85,44 +85,49 @@ export function Standup({
   }
 
   return (
-    <div className="standup">
-      <div className="standup__activeContainer">
-        <h2>
-          {currentUser.id === currentSpeakerId
-            ? "You're up!"
-            : `${currentSpeakerName} is up!`}
-        </h2>
-        {currentSpeaker != null ? (
-          <ParticipantAvatar participant={currentSpeaker} size={128} />
-        ) : null}
-        {currentUser.id === currentSpeakerId && (
-          <img src="burgyPopcorn.png" width={128} />
-        )}
-        <div key={currentSpeakerId}>
-          <div className="standup__progress">
-            <div className="standup__progressText">
-              <span>
-                {Math.ceil((durationMs - currentSpeakerTimeElapsed) / 1000)}
-              </span>
+    <>
+      <div className="standup__wtf">
+        <h1>Hey! Are you paying attention?</h1>
+      </div>
+      <div className="standup">
+        <div className="standup__activeContainer">
+          <h2>
+            {currentUser.id === currentSpeakerId
+              ? "You're up!"
+              : `${currentSpeakerName} is up!`}
+          </h2>
+          {currentSpeaker != null ? (
+            <ParticipantAvatar participant={currentSpeaker} size={128} />
+          ) : null}
+          {currentUser.id === currentSpeakerId && (
+            <img src="burgyPopcorn.png" width={128} />
+          )}
+          <div key={currentSpeakerId}>
+            <div className="standup__progress">
+              <div className="standup__progressText">
+                <span>
+                  {Math.ceil((durationMs - currentSpeakerTimeElapsed) / 1000)}
+                </span>
+              </div>
+              <div
+                className="standup__progressFill"
+                style={{
+                  width: `${
+                    (currentSpeakerTimeElapsed / (durationMs - 1000)) * 100
+                  }%`,
+                }}
+              ></div>
             </div>
-            <div
-              className="standup__progressFill"
-              style={{
-                width: `${
-                  (currentSpeakerTimeElapsed / (durationMs - 1000)) * 100
-                }%`,
-              }}
-            ></div>
           </div>
         </div>
+        {nextSpeaker != null ? (
+          <div>
+            <ParticipantAvatar participant={nextSpeaker} size={32} />
+            <span>Next up: {nextSpeakerName}</span>
+          </div>
+        ) : null}
+        <button onClick={onGoAgain}>reset</button>
       </div>
-      {nextSpeaker != null ? (
-        <div>
-          <ParticipantAvatar participant={nextSpeaker} size={32} />
-          <span>Next up: {nextSpeakerName}</span>
-        </div>
-      ) : null}
-      <button onClick={onGoAgain}>reset</button>
-    </div>
+    </>
   );
 }
