@@ -5,6 +5,7 @@ import "./App.css";
 import { type Participant, type User } from "./useDiscordSdk";
 import type { PendingState } from "./useWebsocket";
 import { ParticipantAvatar } from "./ParticipantAvatar";
+import { Countdown } from "./Countdown";
 
 interface WaitingRoomProps {
   participants: Participant[];
@@ -22,14 +23,22 @@ export function WaitingRoom({
   websocket,
 }: WaitingRoomProps) {
   const [channelName, setChannelName] = useState<string | null>(null);
+  const [startCountdown, setStartCountdown] = useState<boolean>(false);
+  const [duration, setDuration] = useState<number>(15);
+  const isValidDuration = duration >= 5 && duration <= 60;
+
   const start = useCallback(async () => {
+    setStartCountdown(true);
+  }, []);
+
+  const onCountdownComplete = useCallback(async () => {
     websocket?.send(
       JSON.stringify({
         type: "start",
-        duration: 15,
+        duration,
       })
     );
-  }, [websocket]);
+  }, [duration, websocket]);
 
   const leave = useCallback(async () => {
     websocket?.send(
@@ -72,22 +81,55 @@ export function WaitingRoom({
     [currentUser.id, standupState.members]
   );
 
+  if (startCountdown) {
+    return <Countdown onCountdownComplete={onCountdownComplete} />;
+  }
+
   return (
     <div className="waitingRoom">
       <div className="waitingRoom__content">
         <h1>{channelName != null ? `${channelName} Standup` : "Standup"}</h1>
-        <button
-          className="waitingRoom__startButton"
-          onClick={start}
-          disabled={activeParticipants.length === 0}
-        >
-          Start it up!
-        </button>
-        {!isActiveParticipant && (
-          <button className="waitingRoom__joinButton" onClick={join}>
-            Join in!
+        <div className="waitingRoom__controls">
+          <div>Time per person (5-60 seconds)</div>
+          <div className="waitingRoom__durationControls">
+            <button
+              className="waitingRoom__durationControl"
+              onClick={() => setDuration((d) => Math.max(5, d - 1))}
+              title="Decrease value"
+              aria-label="Decrease value"
+            >
+              -
+            </button>
+            <input
+              className="waitingRoom__durationInput"
+              type="number"
+              min="5"
+              max="60"
+              value={duration}
+              onChange={(event) => setDuration(event.target.valueAsNumber)}
+            />
+            <button
+              className="waitingRoom__durationControl"
+              onClick={() => setDuration((d) => Math.min(60, d + 1))}
+              title="Increase value"
+              aria-label="Increase value"
+            >
+              +
+            </button>
+          </div>
+          <button
+            className="waitingRoom__startButton"
+            onClick={start}
+            disabled={activeParticipants.length === 0 || !isValidDuration}
+          >
+            Start it up!
           </button>
-        )}
+          {!isActiveParticipant && (
+            <button className="waitingRoom__joinButton" onClick={join}>
+              Join in!
+            </button>
+          )}
+        </div>
         <div className="waitingRoom__activeParticipants">
           {activeParticipants.map((p) => (
             <div

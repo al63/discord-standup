@@ -112,6 +112,7 @@ export function Standup({
           </div>
         ) : null}
       </div>
+      <button onClick={onGoAgain}>reset</button>
     </div>
   );
 }
