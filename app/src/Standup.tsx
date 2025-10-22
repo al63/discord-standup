@@ -86,7 +86,6 @@ export function Standup({
 
   return (
     <div className="standup">
-      <h1>Standup</h1>
       <div className="standup__activeContainer">
         <h2>
           {currentUser.id === currentSpeakerId
@@ -99,19 +98,30 @@ export function Standup({
         {currentUser.id === currentSpeakerId && (
           <img src="burgyPopcorn.png" width={128} />
         )}
-        <div>
-          <span>
-            Time left:{" "}
-            {Math.floor((durationMs - currentSpeakerTimeElapsed) / 1000)}
-          </span>
-        </div>
-        {nextSpeaker != null ? (
-          <div>
-            <ParticipantAvatar participant={nextSpeaker} size={32} />
-            <span>Next up: {nextSpeakerName}</span>
+        <div key={currentSpeakerId}>
+          <div className="standup__progress">
+            <div className="standup__progressText">
+              <span>
+                {Math.ceil((durationMs - currentSpeakerTimeElapsed) / 1000)}
+              </span>
+            </div>
+            <div
+              className="standup__progressFill"
+              style={{
+                width: `${
+                  (currentSpeakerTimeElapsed / (durationMs - 1000)) * 100
+                }%`,
+              }}
+            ></div>
           </div>
-        ) : null}
+        </div>
       </div>
+      {nextSpeaker != null ? (
+        <div>
+          <ParticipantAvatar participant={nextSpeaker} size={32} />
+          <span>Next up: {nextSpeakerName}</span>
+        </div>
+      ) : null}
       <button onClick={onGoAgain}>reset</button>
     </div>
   );

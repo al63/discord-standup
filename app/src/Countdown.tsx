@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const COUNTDOWN_DURATION = 5;
+const COUNTDOWN_DURATION = 1;
 
 export function Countdown({onCountdownComplete}: {onCountdownComplete: () => void}) {
     const countdownInterval = useRef<number | null>(null);

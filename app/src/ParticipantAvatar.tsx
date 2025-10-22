@@ -3,7 +3,9 @@ import { type Participant } from "./useDiscordSdk";
 
 
 export function ParticipantAvatar({participant, size}: {participant: Participant, size: number}) {
-return <img
+return (
+  <img
+    className="participantAvatar"
     src={
       participant.avatar != null
         ? `https://cdn.discordapp.com/avatars/${participant.id}/${participant.avatar}.png?size=256`
@@ -15,4 +17,5 @@ return <img
     width={size}
     height={size}
   />
+);
 }

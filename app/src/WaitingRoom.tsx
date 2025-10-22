@@ -86,8 +86,8 @@ export function WaitingRoom({
   }
 
   return (
-    <div className="waitingRoom">
-      <div className="waitingRoom__content">
+    <>
+      <div className="waitingRoom">
         <h1>
           <img src="popcorn.png" height="60" />
           {channelName != null ? `${channelName} Standup` : "Standup"}
@@ -158,15 +158,13 @@ export function WaitingRoom({
           ))}
         </div>
       </div>
-      <div className="waitingRoom__sidebar">
-        <h3>In Voice</h3>
+      <div className="waitingRoom__participants">
         {participants.map((p) => (
           <div className="waitingRoom__participant" key={p.id}>
-            <ParticipantAvatar participant={p} size={64} />
-            <div>{p.nickname ?? p.global_name ?? p.username}</div>
+            <ParticipantAvatar participant={p} size={32} />
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
