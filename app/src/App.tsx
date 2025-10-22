@@ -3,12 +3,13 @@ import { useDiscordSdk } from "./useDiscordSdk";
 import { WaitingRoom } from "./WaitingRoom";
 import { useStandupWebsocket } from "./useWebsocket";
 import { Standup } from "./Standup";
+import { LoadingScreen } from "./LoadingScreen";
 
 function App() {
   const { participants, discordSdk, auth } = useDiscordSdk();
   const { standupState, websocket } = useStandupWebsocket(auth, discordSdk);
   if (standupState.type === "loading" || auth == null) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   } else if (standupState.type === "pending") {
     return (
       <WaitingRoom

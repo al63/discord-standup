@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import "./App.css";
 import type { DiscordSDK } from "@discord/embedded-app-sdk";
 import "./App.css";
@@ -31,6 +31,24 @@ export function WaitingRoom({
     );
   }, [websocket]);
 
+  const leave = useCallback(async () => {
+    websocket?.send(
+      JSON.stringify({
+        type: "leave",
+        userId: currentUser.id,
+      })
+    );
+  }, [currentUser.id, websocket]);
+
+  const join = useCallback(async () => {
+    websocket?.send(
+      JSON.stringify({
+        type: "join",
+        userId: currentUser.id,
+      })
+    );
+  }, [currentUser.id, websocket]);
+
   useEffect(() => {
     const fetchChannelName = async () => {
       if (discordSdk.channelId == null) return;
@@ -45,8 +63,13 @@ export function WaitingRoom({
     fetchChannelName();
   }, [discordSdk]);
 
-  const activeParticipants = participants.filter((p) =>
-    standupState.members.includes(p.id)
+  const activeParticipants = useMemo(
+    () => participants.filter((p) => standupState.members.includes(p.id)),
+    [participants, standupState.members]
+  );
+  const isActiveParticipant = useMemo(
+    () => standupState.members.includes(currentUser.id),
+    [currentUser.id, standupState.members]
   );
 
   return (
@@ -56,10 +79,15 @@ export function WaitingRoom({
         <button
           className="waitingRoom__startButton"
           onClick={start}
-          disabled={participants.length === 0}
+          disabled={activeParticipants.length === 0}
         >
           Start it up!
         </button>
+        {!isActiveParticipant && (
+          <button className="waitingRoom__joinButton" onClick={join}>
+            Join in!
+          </button>
+        )}
         <div className="waitingRoom__activeParticipants">
           {activeParticipants.map((p) => (
             <div
@@ -73,7 +101,7 @@ export function WaitingRoom({
                   <div>(you)</div>
                   <button
                     className="waitingRoom__leaveButton"
-                    onClick={() => {}} // TODO
+                    onClick={leave}
                     disabled={participants.length === 0}
                   >
                     leave

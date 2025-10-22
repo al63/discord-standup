@@ -96,6 +96,9 @@ export function Standup({
         {currentSpeaker != null ? (
           <ParticipantAvatar participant={currentSpeaker} size={128} />
         ) : null}
+        {currentUser.id === currentSpeakerId && (
+          <img src="burgyPopcorn.png" width={128} />
+        )}
         <div>
           <span>
             Time left:{" "}
