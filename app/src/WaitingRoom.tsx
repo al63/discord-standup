@@ -122,7 +122,7 @@ export function WaitingRoom({
           </button>
           {!isActiveParticipant && (
             <button className="waitingRoom__joinButton" onClick={join}>
-              Join in!
+              Join
             </button>
           )}
         </div>
