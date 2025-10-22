@@ -81,7 +81,7 @@ export function Standup({
   if (localOffset <= 0) {
     return (
       <div className="countdownScreen">
-        <h1>Starting in</h1>
+        <h1 className="countdownScreen__title">Starting in</h1>
         <div className="countdownScreen__countdown">
           {Math.ceil(Math.abs(localOffset) / 1000)}
         </div>
@@ -93,7 +93,9 @@ export function Standup({
     return (
       <div className="standup__completed">
         <h1>Standup over!</h1>
-        <button onClick={onGoAgain}>Go again?</button>
+        <button className="standup__completedButton" onClick={onGoAgain}>
+          Go again?
+        </button>
       </div>
     );
   }
@@ -105,11 +107,11 @@ export function Standup({
       </div>
       <div className="standup">
         <div className="standup__activeContainer">
-          <h2>
+          <h1>
             {currentUser.id === currentSpeakerId
               ? "You're up!"
-              : `${currentSpeakerName} is up!`}
-          </h2>
+              : `${currentSpeakerName}`}
+          </h1>
           {currentSpeaker != null ? (
             <ParticipantAvatar participant={currentSpeaker} size={128} />
           ) : null}
@@ -135,12 +137,11 @@ export function Standup({
           </div>
         </div>
         {nextSpeaker != null ? (
-          <div>
-            <ParticipantAvatar participant={nextSpeaker} size={32} />
+          <div className="standup__nextSpeaker">
             <span>Next up: {nextSpeakerName}</span>
+            <ParticipantAvatar participant={nextSpeaker} size={32} />
           </div>
         ) : null}
-        <button onClick={onGoAgain}>reset</button>
       </div>
     </>
   );

@@ -8,6 +8,7 @@ import { LoadingScreen } from "./LoadingScreen";
 function App() {
   const { participants, discordSdk, auth } = useDiscordSdk();
   const { standupState, websocket } = useStandupWebsocket(auth, discordSdk);
+
   if (standupState.type === "loading" || auth == null) {
     return <LoadingScreen />;
   } else if (standupState.type === "pending") {
