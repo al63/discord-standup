@@ -88,7 +88,11 @@ export function WaitingRoom({
   return (
     <div className="waitingRoom">
       <div className="waitingRoom__content">
-        <h1>{channelName != null ? `${channelName} Standup` : "Standup"}</h1>
+        <h1>
+          <img src="popcorn.png" height="60" />
+          {channelName != null ? `${channelName} Standup` : "Standup"}
+          <img src="popcorn.png" height="60" />
+        </h1>
         <div className="waitingRoom__controls">
           <div>Time per person (5-60 seconds)</div>
           <div className="waitingRoom__durationControls">
