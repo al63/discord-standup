@@ -33,12 +33,14 @@ export function Standup({
   }, [standupState]);
 
   useEffect(() => {
-    if (completed) return;
+    if (timeout.current != null) {
+      clearTimeout(timeout.current);
+    }
+
+    if (completed || standupState.isPaused) return;
 
     timeout.current = setTimeout(() => {
-      const nextTick = standupState.isPaused
-        ? standupState.pausedAt!.getTime()
-        : Date.now();
+      const nextTick = Date.now();
       setLocalOffset(localOffset + (nextTick - lastTick.current));
       lastTick.current = nextTick;
     }, 250);
