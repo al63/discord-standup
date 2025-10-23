@@ -22,7 +22,7 @@ export function WaitingRoom({
   websocket,
 }: WaitingRoomProps) {
   const [channelName, setChannelName] = useState<string | null>(null);
-  const [duration, setDuration] = useState<number>(15);
+  const [duration, setDuration] = useState<number>(30);
   const isValidDuration = duration >= 5 && duration <= 60;
 
   const start = useCallback(
