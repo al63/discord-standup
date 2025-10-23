@@ -1,18 +1,27 @@
 import "./App.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useReward } from "partycles";
+
 interface Popcorn {
   [id: number]: { x: number; y: number };
 }
+
 function Popcorn({ id, style }: { id: string; style: React.CSSProperties }) {
   // @ts-expect-error the emoji animation config is documented wrong
   const { reward } = useReward(`popcorn-${id}`, "emoji", {
     emojis: ["🍿"],
     particleCount: 1,
   });
+  const ranReward = useRef(false);
 
   useEffect(() => {
+    if (ranReward.current) {
+      return;
+    }
+
+    ranReward.current = true;
     reward();
+    new Audio("pop.mp3").play();
   }, [reward]);
 
   return <div id={`popcorn-${id}`} className="popcorn" style={style} />;
@@ -42,7 +51,7 @@ export function PopcornContainer({
         delete newPopcorn[currentId];
         return newPopcorn;
       });
-    }, 1000);
+    }, 5000);
     id.current++;
   }, []);
 

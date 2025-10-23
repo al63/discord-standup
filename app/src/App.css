@@ -348,6 +348,12 @@ input[type="number"] {
   gap: 8px;
 }
 
+.standup__friend {
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+}
+
 @media (max-width: 400px) and (max-height: 200px) {
   h1 {
     font-size: 20px;
