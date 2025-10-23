@@ -26,6 +26,9 @@ app.post(
   ),
   async (req, res) => {
     // TODO: also gate with check for activity existing, just have one shared middleware or w/e
+    if (!validate(instanceId)) {
+      return res.status(400).json({ error: "Invalid instance" });
+    }
 
     const response = await fetch(`https://discord.com/api/oauth2/token`, {
       method: "POST",
@@ -70,6 +73,20 @@ function broadcastState(instanceId) {
       })
     );
   });
+}
+
+async function validate(instanceId) {
+  // validate activity instance exists
+  const validateResponse = await fetch(
+    `https://discord.com/api/applications/${process.env.VITE_DISCORD_CLIENT_ID}/activity-instances/${instanceId}`,
+    {
+      headers: {
+        method: "GET",
+        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      },
+    }
+  );
+  return validateResponse.status === 200;
 }
 
 app.ws("/api/ws/:instanceId", async (ws, req) => {
@@ -261,6 +278,11 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
     }
     broadcastState(instanceId);
   });
+
+  if (!validate(instanceId)) {
+    ws.close();
+    return;
+  }
 });
 
 app.listen(port, () => {
