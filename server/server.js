@@ -213,6 +213,23 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
       state[instanceId].startedAt = null;
       state[instanceId].duration = null;
       broadcastState(instanceId);
+    } else if (parsed.type === "popcorn") {
+      /*
+      {
+        type: "popcorn",
+        x: 0.23,
+        y: 0.45,
+      }
+      */
+      state[instanceId].connections.forEach((connection) => {
+        connection.send(
+          JSON.stringify({
+            type: "popcorn",
+            x: parsed.x,
+            y: parsed.y,
+          })
+        );
+      });
     } else if (parsed.type === "echo") {
       ws.send(
         JSON.stringify({

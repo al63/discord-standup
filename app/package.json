@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@discord/embedded-app-sdk": "^2.4.0",
+    "partycles": "^1.2.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

@@ -358,6 +358,12 @@ input[type="number"] {
     display: none;
   }
 
+  .waitingRoom__title {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+
   .waitingRoom__activeParticipants {
     margin-top: 8px;
     gap: 0;
