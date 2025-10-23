@@ -401,3 +401,11 @@ input[type="number"] {
     display: none;
   }
 }
+
+.popcorn {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: var(--burgundy);
+  border-radius: 50%;
+}
