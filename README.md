@@ -1,6 +1,6 @@
-# Discord Activity: Getting Started Guide
+# Discord standup activity
 
-Standup discord activity:
+Discord activity to run our team's standup in Discord. Dumb hack week project, don't read our code it's not good.
 
 - Setup a `.env` file at repo root with necessary secrets
 - Run app and server in respective directories `npm install` -> `npm run dev`
