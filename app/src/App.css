@@ -14,25 +14,29 @@
 }
 
 @font-face {
-  font-family: "NunitoSans";
-  src:
-    local("NunitoSans"),
-    url("./fonts/NunitoSans.ttf") format("truetype");
-  font-weight: normal bold;
+  font-family: "ComicNeue";
+  src: local("ComicNeue"),
+    url("./fonts/ComicNeue-Regular.ttf") format("truetype");
+  font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
+  font-family: "ComicNeue";
+  src: local("ComicNeue"), url("./fonts/ComicNeue-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
   font-family: "PermanentMarker";
-  src:
-    local("PermanentMarker"),
+  src: local("PermanentMarker"),
     url("./fonts/PermanentMarker.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 #root {
-  font-family: "NunitoSans", sans-serif;
+  font-family: "ComicNeue", sans-serif;
   width: 100%;
   height: 100%;
   margin: 0 auto;
@@ -410,8 +414,6 @@ input[type="number"] {
 
 .popcorn {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  background-color: var(--burgundy);
-  border-radius: 50%;
+  width: 1px;
+  height: 1px;
 }
