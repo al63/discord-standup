@@ -13,8 +13,24 @@
   --line-height: 60px;
 }
 
+@font-face {
+ font-family: "NunitoSans";
+ src: local("NunitoSans"),
+  url("./fonts/NunitoSans.ttf") format("truetype");
+  font-weight: normal bold;
+  font-style: normal;
+}
+
+@font-face {
+ font-family: "PermanentMarker";
+ src: local("PermanentMarker"),
+  url("./fonts/PermanentMarker.ttf") format("truetype");
+font-weight: normal;
+font-style: normal;
+}
+
 #root {
-  font-family: "Verdana", sans-serif;
+  font-family: "NunitoSans", sans-serif;
   width: 100%;
   height: 100%;
   margin: 0 auto;
@@ -47,6 +63,7 @@ pre {
 }
 
 h1 {
+  font-family: "PermanentMarker", cursive;
   color: var(--burgundy);
 }
 
@@ -61,6 +78,11 @@ h1 {
 .waitingRoom__title {
   margin-top: 59px;
   margin-bottom: 54px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
 .waitingRoom__controls {
@@ -182,6 +204,11 @@ h1 {
   color: white;
   top: 0;
   right: 0;
+
+  &:hover {
+    cursor: pointer;
+    border: 2px solid var(--xanthous);
+  }
 }
 
 @keyframes glow {
