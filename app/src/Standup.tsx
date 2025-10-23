@@ -38,13 +38,17 @@ function Complete({ websocket }: { websocket: WebSocket | null }) {
     reward();
   }, [reward]);
 
-  const onGoAgain = useCallback(() => {
-    websocket?.send(
-      JSON.stringify({
-        type: "reset",
-      })
-    );
-  }, [websocket]);
+  const onGoAgain = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      websocket?.send(
+        JSON.stringify({
+          type: "reset",
+        })
+      );
+    },
+    [websocket]
+  );
 
   return (
     <div id="standup-complete" className="standup__completed">
@@ -107,29 +111,41 @@ export function Standup({
     }
   }, [currentSpeaker, currentIndex, standupState.members.length, localOffset]);
 
-  const pause = useCallback(() => {
-    websocket?.send(
-      JSON.stringify({
-        type: "pause",
-      })
-    );
-  }, [websocket]);
+  const pause = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      websocket?.send(
+        JSON.stringify({
+          type: "pause",
+        })
+      );
+    },
+    [websocket]
+  );
 
-  const resume = useCallback(() => {
-    websocket?.send(
-      JSON.stringify({
-        type: "resume",
-      })
-    );
-  }, [websocket]);
+  const resume = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      websocket?.send(
+        JSON.stringify({
+          type: "resume",
+        })
+      );
+    },
+    [websocket]
+  );
 
-  const skip = useCallback(() => {
-    websocket?.send(
-      JSON.stringify({
-        type: "skip",
-      })
-    );
-  }, [websocket]);
+  const skip = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      websocket?.send(
+        JSON.stringify({
+          type: "skip",
+        })
+      );
+    },
+    [websocket]
+  );
 
   const currentSpeakerName =
     currentSpeaker?.nickname ??

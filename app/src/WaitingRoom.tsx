@@ -25,32 +25,44 @@ export function WaitingRoom({
   const [duration, setDuration] = useState<number>(15);
   const isValidDuration = duration >= 5 && duration <= 60;
 
-  const start = useCallback(async () => {
-    websocket?.send(
-      JSON.stringify({
-        type: "start",
-        duration,
-      })
-    );
-  }, [duration, websocket]);
+  const start = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      websocket?.send(
+        JSON.stringify({
+          type: "start",
+          duration,
+        })
+      );
+    },
+    [duration, websocket]
+  );
 
-  const leave = useCallback(async () => {
-    websocket?.send(
-      JSON.stringify({
-        type: "leave",
-        userId: currentUser.id,
-      })
-    );
-  }, [currentUser.id, websocket]);
+  const leave = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      websocket?.send(
+        JSON.stringify({
+          type: "leave",
+          userId: currentUser.id,
+        })
+      );
+    },
+    [currentUser.id, websocket]
+  );
 
-  const join = useCallback(async () => {
-    websocket?.send(
-      JSON.stringify({
-        type: "join",
-        userId: currentUser.id,
-      })
-    );
-  }, [currentUser.id, websocket]);
+  const join = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      websocket?.send(
+        JSON.stringify({
+          type: "join",
+          userId: currentUser.id,
+        })
+      );
+    },
+    [currentUser.id, websocket]
+  );
 
   useEffect(() => {
     const fetchChannelName = async () => {
@@ -89,7 +101,10 @@ export function WaitingRoom({
             <div className="waitingRoom__durationControls">
               <button
                 className="waitingRoom__durationControl"
-                onClick={() => setDuration((d) => Math.max(5, d - 1))}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDuration((d) => Math.max(5, d - 1));
+                }}
                 title="Decrease value"
                 aria-label="Decrease value"
               >
@@ -105,7 +120,10 @@ export function WaitingRoom({
               />
               <button
                 className="waitingRoom__durationControl"
-                onClick={() => setDuration((d) => Math.min(60, d + 1))}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDuration((d) => Math.min(60, d + 1));
+                }}
                 title="Increase value"
                 aria-label="Increase value"
               >
