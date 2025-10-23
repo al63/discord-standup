@@ -14,19 +14,21 @@
 }
 
 @font-face {
- font-family: "NunitoSans";
- src: local("NunitoSans"),
-  url("./fonts/NunitoSans.ttf") format("truetype");
+  font-family: "NunitoSans";
+  src:
+    local("NunitoSans"),
+    url("./fonts/NunitoSans.ttf") format("truetype");
   font-weight: normal bold;
   font-style: normal;
 }
 
 @font-face {
- font-family: "PermanentMarker";
- src: local("PermanentMarker"),
-  url("./fonts/PermanentMarker.ttf") format("truetype");
-font-weight: normal;
-font-style: normal;
+  font-family: "PermanentMarker";
+  src:
+    local("PermanentMarker"),
+    url("./fonts/PermanentMarker.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 
 #root {
@@ -77,7 +79,7 @@ h1 {
 
 .waitingRoom__title {
   margin-top: 59px;
-  margin-bottom: 54px;
+  margin-bottom: 61px;
   display: flex;
   flex-direction: row;
   align-items: center;
