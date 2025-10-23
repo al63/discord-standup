@@ -1,4 +1,4 @@
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { RunningState } from "./useWebsocket";
 import type { Participant, User } from "./useDiscordSdk";
 import { ParticipantAvatar } from "./ParticipantAvatar";
