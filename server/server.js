@@ -58,10 +58,14 @@ function broadcastState(instanceId) {
           members: state[instanceId].members,
           startedAt: state[instanceId].startedAt,
           duration: state[instanceId].duration,
+          isPaused: state[instanceId].isPaused || false,
+          pausedAt: state[instanceId].pausedAt || null,
           currentOffset:
             state[instanceId].startedAt == null
               ? 0
-              : new Date() - state[instanceId].startedAt,
+              : (state[instanceId].isPaused
+                  ? state[instanceId].pausedAt
+                  : new Date()) - state[instanceId].startedAt,
         },
       })
     );
@@ -142,6 +146,63 @@ app.ws("/api/ws/:instanceId", async (ws, req) => {
         () => Math.random() - 0.5
       );
 
+      broadcastState(instanceId);
+    } else if (parsed.type === "pause") {
+      /*
+      {
+        type: "pause",
+      }
+      */
+      if (state[instanceId].startedAt == null || state[instanceId].isPaused) {
+        return;
+      }
+
+      state[instanceId].isPaused = true;
+      state[instanceId].pausedAt = new Date();
+      broadcastState(instanceId);
+    } else if (parsed.type === "resume") {
+      /*
+      {
+        type: "resume",
+      }
+      */
+      if (state[instanceId].startedAt == null || !state[instanceId].isPaused) {
+        return;
+      }
+      const pauseDuration = new Date() - state[instanceId].pausedAt;
+      state[instanceId].startedAt = new Date(
+        state[instanceId].startedAt.getTime() + pauseDuration
+      );
+      state[instanceId].isPaused = false;
+      state[instanceId].pausedAt = null;
+      broadcastState(instanceId);
+    } else if (parsed.type === "skip") {
+      /*
+      {
+        type: "skip",
+      }
+      */
+      if (state[instanceId].startedAt == null) {
+        return;
+      }
+
+      const now = state[instanceId].isPaused
+        ? state[instanceId].pausedAt
+        : new Date();
+      const elapsed = now - state[instanceId].startedAt;
+      const durationMs = state[instanceId].duration * 1000;
+      const currentIndex = Math.floor(elapsed / durationMs);
+
+      if (currentIndex + 1 >= state[instanceId].members.length) {
+        // no more members to skip to
+        return;
+      }
+
+      // move startedAt by time remaining for current speaker
+      state[instanceId].startedAt = new Date(
+        state[instanceId].startedAt.getTime() -
+          (durationMs - (elapsed % durationMs))
+      );
       broadcastState(instanceId);
     } else if (parsed.type === "reset") {
       /*

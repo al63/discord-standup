@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import type { RunningState } from "./useWebsocket";
 import type { Participant, User } from "./useDiscordSdk";
 import { ParticipantAvatar } from "./ParticipantAvatar";
@@ -36,11 +36,13 @@ export function Standup({
     if (completed) return;
 
     timeout.current = setTimeout(() => {
-      const nextTick = Date.now();
+      const nextTick = standupState.isPaused
+        ? standupState.pausedAt!.getTime()
+        : Date.now();
       setLocalOffset(localOffset + (nextTick - lastTick.current));
       lastTick.current = nextTick;
     }, 250);
-  }, [localOffset, completed]);
+  }, [localOffset, completed, standupState.isPaused, standupState.pausedAt]);
 
   const durationMs = standupState.duration * 1000;
   const currentIndex = Math.floor(localOffset / durationMs);
@@ -62,6 +64,30 @@ export function Standup({
     websocket?.send(
       JSON.stringify({
         type: "reset",
+      })
+    );
+  }, [websocket]);
+
+  const pause = useCallback(() => {
+    websocket?.send(
+      JSON.stringify({
+        type: "pause",
+      })
+    );
+  }, [websocket]);
+
+  const resume = useCallback(() => {
+    websocket?.send(
+      JSON.stringify({
+        type: "resume",
+      })
+    );
+  }, [websocket]);
+
+  const skip = useCallback(() => {
+    websocket?.send(
+      JSON.stringify({
+        type: "skip",
       })
     );
   }, [websocket]);
@@ -119,21 +145,41 @@ export function Standup({
             <img src="burgyPopcorn.png" width={128} />
           )}
           <div key={currentSpeakerId}>
-            <div className="standup__progress">
-              <div className="standup__progressText">
-                <span>
-                  {Math.ceil((durationMs - currentSpeakerTimeElapsed) / 1000)}
-                </span>
+            {standupState.isPaused ? (
+              <div className="standup__pausedText">PAUSED!</div>
+            ) : (
+              <div className="standup__progress">
+                <div className="standup__progressText">
+                  <span>
+                    {Math.ceil((durationMs - currentSpeakerTimeElapsed) / 1000)}
+                  </span>
+                </div>
+                <div
+                  className="standup__progressFill"
+                  style={{
+                    width: `${
+                      (currentSpeakerTimeElapsed / (durationMs - 1000)) * 100
+                    }%`,
+                  }}
+                ></div>
               </div>
-              <div
-                className="standup__progressFill"
-                style={{
-                  width: `${
-                    (currentSpeakerTimeElapsed / (durationMs - 1000)) * 100
-                  }%`,
-                }}
-              ></div>
-            </div>
+            )}
+          </div>
+          <div className="standup__controls">
+            {!standupState.isPaused ? (
+              <button className="standup__controlButton" onClick={pause}>
+                Pause
+              </button>
+            ) : (
+              <button className="standup__controlButton" onClick={resume}>
+                Resume
+              </button>
+            )}
+            {nextSpeaker != null && (
+              <button className="standup__controlButton" onClick={skip}>
+                Skip
+              </button>
+            )}
           </div>
         </div>
         {nextSpeaker != null ? (

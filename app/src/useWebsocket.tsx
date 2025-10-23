@@ -17,6 +17,8 @@ export type RunningState = {
   startedAt: Date;
   duration: number;
   currentOffset: number;
+  isPaused: boolean;
+  pausedAt: Date | null;
 };
 
 export type StandupState = LoadingState | PendingState | RunningState;
@@ -39,7 +41,9 @@ export function useStandupWebsocket(
 
     console.log("connecting to websocket");
     websocket.current = new WebSocket(
-      `wss://${import.meta.env.VITE_DISCORD_CLIENT_ID}.discordsays.com/api/ws/${discordSdk.instanceId}`
+      `wss://${import.meta.env.VITE_DISCORD_CLIENT_ID}.discordsays.com/api/ws/${
+        discordSdk.instanceId
+      }`
     );
 
     websocket.current.addEventListener("open", () => {
@@ -69,6 +73,10 @@ export function useStandupWebsocket(
             startedAt: new Date(parsed.state.startedAt),
             duration: parsed.state.duration,
             currentOffset: parsed.state.currentOffset ?? 0,
+            isPaused: parsed.state.isPaused ?? false,
+            pausedAt: parsed.state.pausedAt
+              ? new Date(parsed.state.pausedAt)
+              : null,
           });
         } else {
           setStandupState({
