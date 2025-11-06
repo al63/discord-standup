@@ -1,12 +1,21 @@
 import "./App.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useReward } from "partycles";
+import type { StandupState } from "./useWebsocket";
 
 interface Popcorn {
   [id: number]: { x: number; y: number };
 }
 
-function Popcorn({ id, style }: { id: string; style: React.CSSProperties }) {
+function Popcorn({
+  id,
+  style,
+  playAudio,
+}: {
+  id: string;
+  style: React.CSSProperties;
+  playAudio: boolean;
+}) {
   // @ts-expect-error the emoji animation config is documented wrong
   const { reward } = useReward(`popcorn-${id}`, "emoji", {
     emojis: ["🍿"],
@@ -21,15 +30,19 @@ function Popcorn({ id, style }: { id: string; style: React.CSSProperties }) {
 
     ranReward.current = true;
     reward();
-    new Audio("pop.mp3").play();
-  }, [reward]);
+    if (playAudio) {
+      new Audio("pop.mp3").play();
+    }
+  }, [reward, playAudio]);
 
   return <div id={`popcorn-${id}`} className="popcorn" style={style} />;
 }
 
 export function PopcornContainer({
   websocket,
+  standupState,
 }: {
+  standupState: StandupState;
   websocket: WebSocket | null;
 }) {
   const id = useRef(0);
@@ -88,7 +101,12 @@ export function PopcornContainer({
   return (
     <>
       {Object.entries(popcorn).map(([id, { x, y }]) => (
-        <Popcorn id={id} key={id} style={{ left: x, top: y }} />
+        <Popcorn
+          id={id}
+          key={id}
+          style={{ left: x, top: y }}
+          playAudio={standupState.type !== "running"}
+        />
       ))}
     </>
   );
