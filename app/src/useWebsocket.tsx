@@ -21,7 +21,15 @@ export type RunningState = {
   pausedAt: Date | null;
 };
 
-export type StandupState = LoadingState | PendingState | RunningState;
+export type CompletedState = {
+  type: "completed";
+};
+
+export type StandupState =
+  | LoadingState
+  | PendingState
+  | RunningState
+  | CompletedState;
 
 export function useStandupWebsocket(
   auth: DiscordAuth | null,
@@ -95,6 +103,7 @@ export function useStandupWebsocket(
 
   return {
     standupState,
+    setStandupState,
     websocket: websocket.current,
   };
 }

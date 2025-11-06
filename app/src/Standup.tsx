@@ -1,72 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { RunningState } from "./useWebsocket";
+import type { RunningState, StandupState } from "./useWebsocket";
 import type { Participant, User } from "./useDiscordSdk";
 import { ParticipantAvatar } from "./ParticipantAvatar";
-import { useReward } from "partycles";
 
 interface StandupProps {
   participants: Participant[];
   standupState: RunningState;
+  setStandupState: (state: StandupState) => void;
   currentUser: User;
   websocket: WebSocket | null;
-}
-
-function Complete({ websocket }: { websocket: WebSocket | null }) {
-  const { reward } = useReward("standup-complete", "confetti", {
-    particleCount: 50,
-    spread: 90,
-    startVelocity: 20,
-    elementSize: 20,
-    lifetime: 150,
-    physics: {
-      gravity: 0.35,
-      wind: 0,
-      friction: 0.98,
-    },
-    effects: {
-      flutter: true,
-    },
-    colors: ["#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3"],
-  });
-  const ranAnimation = useRef(false);
-
-  useEffect(() => {
-    if (ranAnimation.current === true) {
-      return;
-    }
-    ranAnimation.current = true;
-    reward();
-  }, [reward]);
-
-  const onGoAgain = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      websocket?.send(
-        JSON.stringify({
-          type: "reset",
-        })
-      );
-    },
-    [websocket]
-  );
-
-  return (
-    <div id="standup-complete" className="standup__completed">
-      <h1>Standup over!</h1>
-      <button className="standup__completedButton" onClick={onGoAgain}>
-        Go again?
-      </button>
-    </div>
-  );
 }
 
 export function Standup({
   participants,
   standupState,
+  setStandupState,
   currentUser,
   websocket,
 }: StandupProps) {
-  const [completed, setCompleted] = useState<boolean>(false);
   const [localOffset, setLocalOffset] = useState<number>(
     standupState.currentOffset
   );
@@ -87,14 +38,14 @@ export function Standup({
       clearTimeout(timeout.current);
     }
 
-    if (completed || standupState.isPaused) return;
+    if (standupState.isPaused) return;
 
     timeout.current = setTimeout(() => {
       const nextTick = Date.now();
       setLocalOffset(localOffset + (nextTick - lastTick.current));
       lastTick.current = nextTick;
     }, 250);
-  }, [localOffset, completed, standupState.isPaused, standupState.pausedAt]);
+  }, [localOffset, standupState.isPaused, standupState.pausedAt]);
 
   const durationMs = standupState.duration * 1000;
   const currentIndex = Math.floor(localOffset / durationMs);
@@ -107,9 +58,17 @@ export function Standup({
       (localOffset > 0 && currentSpeaker == null) ||
       currentIndex >= standupState.members.length
     ) {
-      setCompleted(true);
+      setStandupState({
+        type: "completed",
+      });
     }
-  }, [currentSpeaker, currentIndex, standupState.members.length, localOffset]);
+  }, [
+    currentSpeaker,
+    currentIndex,
+    standupState.members.length,
+    localOffset,
+    setStandupState,
+  ]);
 
   const pause = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -168,10 +127,6 @@ export function Standup({
         </div>
       </div>
     );
-  }
-
-  if (completed) {
-    return <Complete websocket={websocket} />;
   }
 
   return (
