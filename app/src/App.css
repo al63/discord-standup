@@ -45,6 +45,7 @@
   background-color: var(--background);
   z-index: 0;
   position: relative;
+  user-select: none;
 
   background-image: linear-gradient(var(--lines) 0.01em, transparent 0.05em);
   background-size: 100% var(--line-height);
