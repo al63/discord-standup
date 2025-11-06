@@ -74,7 +74,7 @@ const AppContainer = () => {
 
   return (
     <>
-      <PopcornContainer websocket={websocket} />
+      <PopcornContainer websocket={websocket} standupState={standupState} />
       <App {...props} />
     </>
   );
