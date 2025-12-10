@@ -28,7 +28,7 @@ async function validateInstance(instanceId) {
   console.log('validate instance response', validateResponse.status, validateResponse.headers.raw())
   return validateResponse.status === 200;
   */
-  return true;
+ return true;
 }
 
 // Allow express to parse JSON bodies
@@ -61,6 +61,8 @@ app.post(
         code: req.body.code,
       }),
     });
+
+    console.log('token response', response.status, response.headers.raw())
 
     const { access_token } = await response.json();
     res.send({ access_token });
