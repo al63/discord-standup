@@ -14,7 +14,6 @@ const port = 3001;
 const COUNTDOWN_SECONDS_MS = 5000;
 
 async function validateInstance(instanceId) {
-  /*
   // validate activity instance exists
   const validateResponse = await fetch(
     `https://discord.com/api/applications/${process.env.VITE_DISCORD_CLIENT_ID}/activity-instances/${instanceId}`,
@@ -25,10 +24,12 @@ async function validateInstance(instanceId) {
       },
     }
   );
-  console.log('validate instance response', validateResponse.status, validateResponse.headers.raw())
+
+  if (validateResponse.status !== 200) {
+    console.log('validate instance error:', validateResponse.status, validateResponse.headers.raw())
+  }
+
   return validateResponse.status === 200;
-  */
- return true;
 }
 
 // Allow express to parse JSON bodies
@@ -61,8 +62,6 @@ app.post(
         code: req.body.code,
       }),
     });
-
-    console.log('token response', response.status, response.headers.raw())
 
     const { access_token } = await response.json();
     res.send({ access_token });
