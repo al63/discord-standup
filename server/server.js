@@ -24,7 +24,7 @@ async function validateInstance(instanceId) {
       },
     }
   );
-  console.log('validate instance response', validateResponse.status)
+  console.log('validate instance response', validateResponse.status, validateResponse.headers.raw())
   return validateResponse.status === 200;
 }
 
